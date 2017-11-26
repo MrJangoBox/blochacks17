@@ -16,6 +16,7 @@ module.exports = function (server, cloudant) {
 
         db.insert(user, function(err, body, header) {
             if (err) {
+                console.debug('hello')
                 return console.log('[ambassadors.insert] ', err.message);
             }
 
