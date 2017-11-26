@@ -1,5 +1,5 @@
 {
-	"name": "PremoForm",
+	"name": "BLockHacks2017",
 	"version": "0.0.1",
 	"private": true,
 	"scripts": {
@@ -7,14 +7,17 @@
 	},
 	"dependencies": {
 		"async": "^2.1.4",
-		"restify": "^4.0.3",
+		"body-parser": "^1.18.2",
 		"cfenv": "1.0.x",
-		"forever": "^0.15.1",
 		"cloudant": "^1.6.2",
-		"nodemailer": "^0.7.1"
+		"express": "^4.16.2",
+		"forever": "^0.15.1",
+		"mongodb": "^2.2.33",
+		"nodemailer": "^0.7.1",
+		"restify": "^4.0.3"
 	},
 	"repository": {},
 	"engines": {
 		"node": "4.x"
-	} 
+	}
 }

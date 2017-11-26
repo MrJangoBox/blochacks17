@@ -6,29 +6,37 @@
 
 // This application uses express as its web server
 // for more info, see: http://expressjs.com
-// var express = require('express');
-var restify     =   require('restify');
+var express = require('express');
 
 // cfenv provides access to your Cloud Foundry environment
 // for more info, see: https://www.npmjs.com/package/cfenv
 var cfenv = require('cfenv');
 
-// Load the Cloudant library.
-var Cloudant = require('cloudant');
+// Parse incoming request bodies
+var bodyParser = require('body-parser')
 
-// Off platform connection
-var cloudant = Cloudant("https://Username:username2@address.cloudant.com");
+// Retrieve
+var MongoClient = require('mongodb').MongoClient;
+var db;
+
+// Connect to the db
+MongoClient.connect("mongodb://admin:pass321@ds121696.mlab.com:21696/blockhack2017", function(err, database) {
+  db = database;
+
+  db.collection('refugees', function(err, collection) {});
+  if(!err) {
+    console.log("We are connected");
+  }
+});
 
 // create a new express server
-// var app = express();
-var server      =   restify.createServer();
-
-server.use(restify.acceptParser(server.acceptable));
-server.use(restify.queryParser());
-server.use(restify.bodyParser());
+var server = express();
 
 // serve the files out of ./public as our main files
-// app.use(express.static(__dirname + '/public'));
+server.use(express.static(__dirname + '/public'));
+
+// Body parser
+server.use(bodyParser.json())
 
 // CORS
 server.use(function(req, res, next) {
@@ -47,8 +55,37 @@ server.listen(appEnv.port, '0.0.0.0', function() {
   console.log("server starting on " + appEnv.url);
 });
 
-// Js files to db collections links
-var manageNewAmbassador = require('./public/manageAmbassadors/manageNewAmbassador')(server, cloudant);
-var manageNewPost = require('./public/managePosts/manageNewPost')(server, cloudant);
-var getPosts = require('./public/managePosts/getPosts')(server, cloudant);
-// var manageNewPost = require('./public/manageEmails/manageWelcomeEmail')(server, cloudant);
+// Reuse database object in request handlers
+server.get("/", function(req, res) {
+  db.collection("refugees").find({}, function(err, docs) {
+    docs.each(function(err, doc) {
+      if(doc) {
+        console.log(doc);
+      }
+      else {
+        res.end();
+      }
+    });
+  });
+});
+
+server.get("/api/v1/refugees", function(req, res) {
+  db.collection("refugees").find({}).toArray(function(err, docs) {
+    res.end(JSON.stringify(docs));
+  });
+});
+
+server.post("/api/v1/refugee", function(req, res) {
+  db.collection('refugees').insertOne({
+    firstName: req.body.firstName,
+    lastName: req.body.lastName,
+    email: req.body.email,
+    age: req.body.age
+  }).then(function(result) {
+    res.writeHead(200, {
+      'Content-Type': 'application/json; charset=utf-8'
+    });
+    res.end(JSON.stringify(result));
+  })
+});
+
