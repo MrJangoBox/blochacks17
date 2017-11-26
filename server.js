@@ -77,10 +77,11 @@ server.get("/api/v1/refugees", function(req, res) {
 
 server.post("/api/v1/refugee", function(req, res) {
   db.collection('refugees').insertOne({
-    firstName: req.body.firstName,
-    lastName: req.body.lastName,
+    first_name: req.body.first_name,
+    last_name: req.body.last_name,
     email: req.body.email,
-    age: req.body.age
+    age: req.body.age,
+    camp_id: req.body.camp_id
   }).then(function(result) {
     res.writeHead(200, {
       'Content-Type': 'application/json; charset=utf-8'
